@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV DPIA Tool — Coming Soon</title>
+  <meta name="description" content="Data Protection Impact Assessment tool for CV Global — coming soon">
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1466.1 699.15'%3E%3Cpath d='m1168.42 233.05c-13.36 0-26.18 5.31-35.63 14.76l-140 140c-11.49 11.49-26.77 17.82-43.03 17.82s-31.53-6.33-43.03-17.82l-107.98-107.98c-30.17-30.17-70.28-46.78-112.95-46.78h-333.37c-63.1 0-116.92 48.98-119.3 112.03-2.5 66.29 50.7 121.02 116.44 121.02h388.1l-45.61-45.61c-9.51-9.51-22.41-14.85-35.86-14.85h-304.98c-29.18 0-54.72-21.61-57.45-50.66-3.14-33.33 23.11-61.46 55.8-61.46h336.23c26.33 0 51.58 10.46 70.2 29.08l106.19 106.19c22.22 22.22 51.81 36.15 83.22 37.24 34.02 1.18 66.2-11.52 90.13-35.46l197.51-197.51h-64.63z'/%3E%3C/svg%3E">
+
+  <style>
+    /* ── Brand Tokens (matching data-classifier) ─── */
+    :root {
+      --black: #000000;
+      --white: #FFFFFF;
+      --green-light: #A8FFA3;
+      --green-mid: #5BFF54;
+      --green-dark: #00C200;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    [data-theme="dark"] {
+      --bg: #000000;
+      --bg-card: #111111;
+      --text: #FFFFFF;
+      --text-muted: #999999;
+      --border: #222222;
+      --accent: var(--green-light);
+      --accent-text: #000000;
+      --badge-bg: rgba(168, 255, 163, 0.1);
+      --badge-border: rgba(168, 255, 163, 0.25);
+    }
+
+    [data-theme="light"] {
+      --bg: #FFFFFF;
+      --bg-card: #F7F7F7;
+      --text: #000000;
+      --text-muted: #666666;
+      --border: #E0E0E0;
+      --accent: var(--green-dark);
+      --accent-text: #FFFFFF;
+      --badge-bg: rgba(0, 194, 0, 0.08);
+      --badge-border: rgba(0, 194, 0, 0.25);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html { font-size: 16px; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s var(--ease), color 0.3s var(--ease);
+    }
+
+    /* ── Header bar ─────────────────────────────── */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      z-index: 10;
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo {
+      height: 28px;
+      width: auto;
+    }
+
+    .logo-label {
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .theme-toggle {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--accent);
+    }
+
+    /* ── Hero ───────────────────────────────────── */
+    .hero {
+      text-align: center;
+      max-width: 560px;
+      padding: 2rem 1.5rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.9rem;
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 1.75rem;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+    }
+
+    /* ── Info card ──────────────────────────────── */
+    .info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      text-align: left;
+    }
+
+    .info-card-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .info-row:first-of-type {
+      padding-top: 0;
+    }
+
+    .info-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .info-icon svg {
+      width: 15px;
+      height: 15px;
+      stroke: var(--accent);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .info-text strong {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.1rem;
+    }
+
+    .info-text span {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* ── Footer ─────────────────────────────────── */
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Top bar -->
+  <header class="top-bar">
+    <div class="logo-wrap">
+      <svg id="logo-dark" class="logo" enable-background="new 0 0 1466.1 699.15" viewBox="0 0 1466.1 699.15"
+        xmlns="http://www.w3.org/2000/svg" style="display:none">
+        <path
+          d="m1168.42 233.05c-13.36 0-26.18 5.31-35.63 14.76l-140 140c-11.49 11.49-26.77 17.82-43.03 17.82s-31.53-6.33-43.03-17.82l-107.98-107.98c-30.17-30.17-70.28-46.78-112.95-46.78h-333.37c-63.1 0-116.92 48.98-119.3 112.03-2.5 66.29 50.7 121.02 116.44 121.02h388.1l-45.61-45.61c-9.51-9.51-22.41-14.85-35.86-14.85h-304.98c-29.18 0-54.72-21.61-57.45-50.66-3.14-33.33 23.11-61.46 55.8-61.46h336.23c26.33 0 51.58 10.46 70.2 29.08l106.19 106.19c22.22 22.22 51.81 36.15 83.22 37.24 34.02 1.18 66.2-11.52 90.13-35.46l197.51-197.51h-64.63z"
+          fill="#fff" />
+      </svg>
+      <svg id="logo-light" class="logo" enable-background="new 0 0 1466.1 699.15" viewBox="0 0 1466.1 699.15"
+        xmlns="http://www.w3.org/2000/svg" style="display:none">
+        <path
+          d="m1168.42 233.05c-13.36 0-26.18 5.31-35.63 14.76l-140 140c-11.49 11.49-26.77 17.82-43.03 17.82s-31.53-6.33-43.03-17.82l-107.98-107.98c-30.17-30.17-70.28-46.78-112.95-46.78h-333.37c-63.1 0-116.92 48.98-119.3 112.03-2.5 66.29 50.7 121.02 116.44 121.02h388.1l-45.61-45.61c-9.51-9.51-22.41-14.85-35.86-14.85h-304.98c-29.18 0-54.72-21.61-57.45-50.66-3.14-33.33 23.11-61.46 55.8-61.46h336.23c26.33 0 51.58 10.46 70.2 29.08l106.19 106.19c22.22 22.22 51.81 36.15 83.22 37.24 34.02 1.18 66.2-11.52 90.13-35.46l197.51-197.51h-64.63z"
+          fill="#000" />
+      </svg>
+      <span class="logo-label">CV Global</span>
+    </div>
+    <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
+      <span id="theme-icon">&#x2600;</span>
+    </button>
+  </header>
+
+  <!-- Hero -->
+  <main class="hero">
+    <div class="badge">
+      <span class="badge-dot"></span>
+      In Development
+    </div>
+
+    <h1>DPIA <span>Coming Soon</span></h1>
+
+    <p class="subtitle">
+      The Data Protection Impact Assessment tool is on its way —
+      helping you meet GDPR Article 35 requirements with a guided, structured workflow.
+    </p>
+
+    <div class="info-card">
+      <div class="info-card-title">What to expect</div>
+
+      <div class="info-row">
+        <div class="info-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+        </div>
+        <div class="info-text">
+          <strong>GDPR Art. 35 Compliance</strong>
+          <span>Structured impact assessments for high-risk processing activities</span>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <div class="info-text">
+          <strong>Privacy by Design</strong>
+          <span>Built-in guidance on embedding privacy controls from the ground up</span>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <div class="info-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        </div>
+        <div class="info-text">
+          <strong>Integrates with Data Classifier</strong>
+          <span>Works alongside the existing classification tool for end-to-end data governance</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    CV Global &middot; Data Governance Suite &middot;
+    Questions? <a href="mailto:uk.privacy@cvglobal.co">uk.privacy@cvglobal.co</a>
+  </footer>
+
+  <script>
+    function initTheme() {
+      const saved = sessionStorage.getItem('cv-theme');
+      const theme = saved || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+      updateThemeUI(theme);
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      sessionStorage.setItem('cv-theme', next);
+      updateThemeUI(next);
+    }
+
+    function updateThemeUI(theme) {
+      document.getElementById('theme-icon').innerHTML = theme === 'dark' ? '&#x2600;' : '&#x1F319;';
+      document.getElementById('logo-dark').style.display = theme === 'dark' ? 'block' : 'none';
+      document.getElementById('logo-light').style.display = theme === 'light' ? 'block' : 'none';
+    }
+
+    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+    initTheme();
+  </script>
+
+</body>
+</html>
