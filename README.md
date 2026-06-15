@@ -1,5 +1,8 @@
 # CV DPIA Tool — Data Protection Impact Assessment
 
+https://joshuadaniel-cv.github.io/DPIA/
+
+
 ## Introduction
 
 A **Data Protection Impact Assessment (DPIA)** is a systematic process for identifying and minimizing data protection risks before you process personal data at scale. It's a legal requirement under **GDPR Article 35** for high-risk processing activities.
