@@ -6,6 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CV DPIA Tool — Coming Soon</title>
   <meta name="description" content="Data Protection Impact Assessment tool for CV Global — coming soon">
+
+  <!-- StaticCrypt for password protection -->
+  <script src="https://cdn.jsdelivr.net/npm/libsodium.js@0.7.10/dist/browsers-combined/libsodium.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/staticrypt@2.3.0/staticrypt.js"></script>
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1466.1 699.15'%3E%3Cpath d='m1168.42 233.05c-13.36 0-26.18 5.31-35.63 14.76l-140 140c-11.49 11.49-26.77 17.82-43.03 17.82s-31.53-6.33-43.03-17.82l-107.98-107.98c-30.17-30.17-70.28-46.78-112.95-46.78h-333.37c-63.1 0-116.92 48.98-119.3 112.03-2.5 66.29 50.7 121.02 116.44 121.02h388.1l-45.61-45.61c-9.51-9.51-22.41-14.85-35.86-14.85h-304.98c-29.18 0-54.72-21.61-57.45-50.66-3.14-33.33 23.11-61.46 55.8-61.46h336.23c26.33 0 51.58 10.46 70.2 29.08l106.19 106.19c22.22 22.22 51.81 36.15 83.22 37.24 34.02 1.18 66.2-11.52 90.13-35.46l197.51-197.51h-64.63z'/%3E%3C/svg%3E">
 
@@ -44,6 +48,108 @@
       --accent-text: #FFFFFF;
       --badge-bg: rgba(0, 194, 0, 0.08);
       --badge-border: rgba(0, 194, 0, 0.25);
+    }
+
+    /* ── Password Protection ─── */
+    .password-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.3s var(--ease);
+    }
+
+    .password-overlay.hidden {
+      display: none;
+    }
+
+    .password-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .password-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .password-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      line-height: 1.5;
+    }
+
+    .password-input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.2s var(--ease);
+    }
+
+    .password-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(168, 255, 163, 0.1);
+    }
+
+    .password-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .password-button {
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      background: var(--accent);
+      color: var(--accent-text);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      font-family: inherit;
+    }
+
+    .password-button:hover {
+      background: var(--accent-hover) != var(--accent) ? var(--accent-hover) : var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .password-button:active {
+      transform: translateY(0);
+    }
+
+    .password-error {
+      color: #FF3C3C;
+      font-size: 0.8rem;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .password-error.show {
+      display: block;
     }
 
     *, *::before, *::after {
@@ -269,6 +375,28 @@
 
 <body>
 
+  <!-- Password Protection Overlay -->
+  <div class="password-overlay" id="passwordOverlay">
+    <div class="password-container">
+      <div class="password-title">🔐 Access Required</div>
+      <p class="password-subtitle">This DPIA tool is protected. Please enter the passcode to continue.</p>
+      <div class="password-input-group">
+        <input
+          type="password"
+          id="passwordInput"
+          class="password-input"
+          placeholder="Enter passcode"
+          aria-label="Enter passcode"
+        />
+      </div>
+      <button class="password-button" id="passwordButton">Unlock</button>
+      <div class="password-error" id="passwordError">Incorrect passcode. Please try again.</div>
+    </div>
+  </div>
+
+  <!-- Main Content (hidden until authenticated) -->
+  <div id="mainContent" style="display: none;">
+
   <!-- Top bar -->
   <header class="top-bar">
     <div class="logo-wrap">
@@ -346,7 +474,62 @@
     Questions? <a href="mailto:uk.privacy@cvglobal.co">uk.privacy@cvglobal.co</a>
   </footer>
 
+  </div><!-- End mainContent -->
+
   <script>
+    // ── Password Protection ──────────────────────────────
+    const CORRECT_PASSCODE = 'test';
+
+    function checkAuthentication() {
+      const isAuthenticated = sessionStorage.getItem('dpia-authenticated') === 'true';
+      return isAuthenticated;
+    }
+
+    function authenticateUser(passcode) {
+      if (passcode === CORRECT_PASSCODE) {
+        sessionStorage.setItem('dpia-authenticated', 'true');
+        return true;
+      }
+      return false;
+    }
+
+    function showMainContent() {
+      document.getElementById('passwordOverlay').classList.add('hidden');
+      document.getElementById('mainContent').style.display = 'block';
+      initTheme();
+    }
+
+    function handlePasswordSubmit() {
+      const passcode = document.getElementById('passwordInput').value;
+      const errorEl = document.getElementById('passwordError');
+
+      if (authenticateUser(passcode)) {
+        errorEl.classList.remove('show');
+        showMainContent();
+      } else {
+        errorEl.classList.add('show');
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordInput').focus();
+      }
+    }
+
+    // Check authentication on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      if (checkAuthentication()) {
+        showMainContent();
+      } else {
+        // Setup password form
+        document.getElementById('passwordButton').addEventListener('click', handlePasswordSubmit);
+        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            handlePasswordSubmit();
+          }
+        });
+        document.getElementById('passwordInput').focus();
+      }
+    });
+
+    // ── Theme Management ────────────────────────────────
     function initTheme() {
       const saved = sessionStorage.getItem('cv-theme');
       const theme = saved || 'dark';
@@ -363,13 +546,21 @@
     }
 
     function updateThemeUI(theme) {
-      document.getElementById('theme-icon').innerHTML = theme === 'dark' ? '&#x2600;' : '&#x1F319;';
-      document.getElementById('logo-dark').style.display = theme === 'dark' ? 'block' : 'none';
-      document.getElementById('logo-light').style.display = theme === 'light' ? 'block' : 'none';
+      const themeToggle = document.getElementById('theme-toggle');
+      const logoDark = document.getElementById('logo-dark');
+      const logoLight = document.getElementById('logo-light');
+      const themeIcon = document.getElementById('theme-icon');
+
+      if (themeIcon) themeIcon.innerHTML = theme === 'dark' ? '&#x2600;' : '&#x1F319;';
+      if (logoDark) logoDark.style.display = theme === 'dark' ? 'block' : 'none';
+      if (logoLight) logoLight.style.display = theme === 'light' ? 'block' : 'none';
     }
 
-    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
-    initTheme();
+    // Attach theme toggle listener if element exists
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', toggleTheme);
+    }
   </script>
 
 </body>
