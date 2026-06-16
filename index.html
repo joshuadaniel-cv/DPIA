@@ -10,6 +10,9 @@
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1466.1 699.15'%3E%3Cpath d='m1168.42 233.05c-13.36 0-26.18 5.31-35.63 14.76l-140 140c-11.49 11.49-26.77 17.82-43.03 17.82s-31.53-6.33-43.03-17.82l-107.98-107.98c-30.17-30.17-70.28-46.78-112.95-46.78h-333.37c-63.1 0-116.92 48.98-119.3 112.03-2.5 66.29 50.7 121.02 116.44 121.02h388.1l-45.61-45.61c-9.51-9.51-22.41-14.85-35.86-14.85h-304.98c-29.18 0-54.72-21.61-57.45-50.66-3.14-33.33 23.11-61.46 55.8-61.46h336.23c26.33 0 51.58 10.46 70.2 29.08l106.19 106.19c22.22 22.22 51.81 36.15 83.22 37.24 34.02 1.18 66.2-11.52 90.13-35.46l197.51-197.51h-64.63z'/%3E%3C/svg%3E">
 
+  <!-- PDF Export Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <style>
     /* ── Brand Tokens ─── */
     :root {
@@ -763,6 +766,7 @@
             <div class="button-group">
               <button type="button" class="btn btn-secondary" onclick="goToStep(6)">← Previous</button>
               <button type="button" class="btn" onclick="completeDPIA()">Complete DPIA ✓</button>
+              <button type="button" class="btn" onclick="exportPDF()" style="background: #6EAEF2;">📥 Export to PDF</button>
             </div>
             <div class="status-message">All information saved</div>
           </form>
@@ -918,7 +922,104 @@
 
     function completeDPIA() {
       saveForm();
-      alert('✓ DPIA Complete!\n\nNext Steps:\n- Review with DPO\n- Export documentation (coming soon)\n- Integrate with ROPA');
+      alert('✓ DPIA Complete!\n\nNext Steps:\n- Export to PDF\n- Review with DPO\n- Integrate with ROPA');
+    }
+
+    function exportPDF() {
+      saveForm();
+
+      // Create PDF content
+      const now = new Date();
+      const dateTime = now.toLocaleString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+
+      const pdfContent = `
+        <div style="font-family: Arial, sans-serif; color: #000; padding: 40px; max-width: 900px; margin: 0 auto;">
+
+          <!-- Watermark -->
+          <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 120px; opacity: 0.1; font-weight: bold; z-index: -1; color: red; pointer-events: none;">
+            TESTING
+          </div>
+
+          <!-- Header -->
+          <h1 style="text-align: center; color: #000; margin-bottom: 10px;">CV DPIA Tool</h1>
+          <h2 style="text-align: center; color: #666; font-size: 16px; margin-bottom: 30px;">Data Protection Impact Assessment Report</h2>
+
+          <!-- Metadata -->
+          <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 30px; font-size: 13px; border-left: 4px solid #00C200;">
+            <p style="margin: 5px 0;"><strong>Export Date & Time:</strong> ${dateTime}</p>
+            <p style="margin: 5px 0;"><strong>Status:</strong> TESTING</p>
+            <p style="margin: 5px 0;"><strong>Document Type:</strong> Data Protection Impact Assessment</p>
+            <p style="margin: 5px 0;"><strong>Compliance:</strong> GDPR Article 35 | ISO/IEC 27001:2022</p>
+          </div>
+
+          <!-- Step 1 Summary -->
+          <h3 style="color: #00C200; border-bottom: 2px solid #00C200; padding-bottom: 10px; margin-top: 30px;">STEP 1: Identify the Need for a DPIA</h3>
+          <p><strong>Project Description:</strong></p>
+          <p style="white-space: pre-wrap; background: #f9f9f9; padding: 10px; border-radius: 4px;">${formData['step1-project'] || '(Not completed)'}</p>
+          <p><strong>Reason for DPIA:</strong> ${formData['step1-reason'] || '(Not specified)'}</p>
+          <p><strong>Related Documents:</strong> ${formData['step1-docs'] || '(None provided)'}</p>
+
+          <!-- Step 2 Summary -->
+          <h3 style="color: #00C200; border-bottom: 2px solid #00C200; padding-bottom: 10px; margin-top: 30px;">STEP 2: Describe the Processing</h3>
+          <p><strong>Data Flow:</strong></p>
+          <p style="white-space: pre-wrap; background: #f9f9f9; padding: 10px; border-radius: 4px;">${formData['step2-flow'] || '(Not completed)'}</p>
+          <p><strong>Retention Period:</strong> ${formData['step2-retention'] || '(Not specified)'}</p>
+          <p><strong>Who Has Access:</strong></p>
+          <p style="white-space: pre-wrap; background: #f9f9f9; padding: 10px; border-radius: 4px;">${formData['step2-access'] || '(Not specified)'}</p>
+          <p><strong>Data Sharing:</strong> ${formData['step2-sharing'] || '(Not specified)'}</p>
+
+          <!-- Step 3 Summary -->
+          <h3 style="color: #00C200; border-bottom: 2px solid #00C200; padding-bottom: 10px; margin-top: 30px;">STEP 3: Consultation Process</h3>
+          <p><strong>Who Consulted:</strong></p>
+          <p style="white-space: pre-wrap; background: #f9f9f9; padding: 10px; border-radius: 4px;">${formData['step3-who'] || '(Not completed)'}</p>
+          <p><strong>How & When:</strong></p>
+          <p style="white-space: pre-wrap; background: #f9f9f9; padding: 10px; border-radius: 4px;">${formData['step3-how'] || '(Not completed)'}</p>
+          <p><strong>Concerns & Recommendations:</strong></p>
+          <p style="white-space: pre-wrap; background: #f9f9f9; padding: 10px; border-radius: 4px;">${formData['step3-concerns'] || '(None recorded)'}</p>
+
+          <!-- Step 4 Summary -->
+          <h3 style="color: #00C200; border-bottom: 2px solid #00C200; padding-bottom: 10px; margin-top: 30px;">STEP 4: Assess Necessity & Proportionality</h3>
+          <p><strong>Lawful Basis:</strong> ${formData['step4-basis'] || '(Not specified)'}</p>
+          <p><strong>Data Minimization:</strong></p>
+          <p style="white-space: pre-wrap; background: #f9f9f9; padding: 10px; border-radius: 4px;">${formData['step4-minimize'] || '(Not specified)'}</p>
+
+          <!-- Step 7 Summary -->
+          <h3 style="color: #00C200; border-bottom: 2px solid #00C200; padding-bottom: 10px; margin-top: 30px;">STEP 7: Sign Off & Record Outcomes</h3>
+          <p><strong>DPO Name:</strong> ${formData['step7-dpo-name'] || '(Not provided)'}</p>
+          <p><strong>DPO Email:</strong> ${formData['step7-dpo-email'] || '(Not provided)'}</p>
+          <p><strong>Business Owner Name:</strong> ${formData['step7-owner-name'] || '(Not provided)'}</p>
+          <p><strong>Can Processing Proceed:</strong> ${formData['step7-proceed'] || '(Not decided)'}</p>
+          <p><strong>Next Review Date:</strong> ${formData['step7-review'] || '(Not set)'}</p>
+
+          <!-- Footer -->
+          <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666;">
+            <p>This DPIA was generated using the CV DPIA Tool.</p>
+            <p>Document Status: <strong style="color: #FF3C3C;">TESTING</strong> - Not for production use</p>
+            <p>For questions, contact: uk.privacy@cvglobal.co</p>
+          </div>
+        </div>
+      `;
+
+      // PDF options with watermark effect
+      const opt = {
+        margin: 10,
+        filename: `DPIA_${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+      };
+
+      // Generate PDF
+      html2pdf().set(opt).from(pdfContent).save();
+
+      alert('✓ PDF exported successfully!\n\nFile: DPIA_' + now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0') + '.pdf');
     }
 
     // Init
