@@ -1,0 +1,362 @@
+{
+  "steps": [
+    {
+      "stepNumber": 1,
+      "stepTitle": "Identify the Need for a DPIA",
+      "stepDescription": "Explaining why this DPIA matters and who is responsible",
+      "questions": [
+        {
+          "id": "step1-project",
+          "type": "textarea",
+          "label": "Project Title & Description",
+          "placeholder": "What are you trying to achieve?",
+          "required": true,
+          "description": "Provide a clear title and concise description of your data processing project. Include the main objectives, scope, and key stakeholders involved."
+        },
+        {
+          "id": "step1-reason",
+          "type": "radio",
+          "label": "Why was a DPIA needed?",
+          "required": true,
+          "options": [
+            {
+              "value": "high-risk",
+              "label": "High-risk processing",
+              "description": "Processing that could pose high risks to individuals' rights and freedoms"
+            },
+            {
+              "value": "special-category",
+              "label": "Special category data",
+              "description": "Processing involving sensitive data (ethnicity, religion, health, etc.)"
+            },
+            {
+              "value": "large-scale",
+              "label": "Large-scale processing",
+              "description": "Processing of large amounts of personal data systematically"
+            },
+            {
+              "value": "children",
+              "label": "Processing involves children",
+              "description": "Processing of personal data of children (under 16)"
+            }
+          ],
+          "description": "Select the primary reason(s) that triggered the need for a DPIA under Article 35 of GDPR. You may have multiple reasons."
+        },
+        {
+          "id": "step1-docs",
+          "type": "text",
+          "label": "Related Documents",
+          "placeholder": "Link to project proposal, etc.",
+          "required": false,
+          "description": "Provide links or references to relevant project documentation, such as the project proposal, system design, security review, or business case."
+        }
+      ]
+    },
+    {
+      "stepNumber": 2,
+      "stepTitle": "Describe the Processing",
+      "stepDescription": "How you collect, use, store, and delete data",
+      "questions": [
+        {
+          "id": "step2-flow",
+          "type": "textarea",
+          "label": "Data Flow & Description",
+          "placeholder": "How is data collected, used, stored, deleted?",
+          "required": true,
+          "description": "Describe the complete data lifecycle: where data is collected from, how it flows through systems, how it's used, stored, and ultimately deleted or archived. Include all systems and processes involved."
+        },
+        {
+          "id": "step2-retention",
+          "type": "text",
+          "label": "Data Retention Period",
+          "placeholder": "e.g., 7 years",
+          "required": true,
+          "description": "Specify how long personal data will be retained. This should be based on legal requirements and business necessity. Shorter retention periods are preferred under data minimization principles."
+        },
+        {
+          "id": "step2-access",
+          "type": "textarea",
+          "label": "Who has access?",
+          "placeholder": "Internal teams, external processors, etc.",
+          "required": true,
+          "description": "List all parties who have access to the personal data, including internal teams (HR, Finance, IT), external service providers, contractors, and any third parties. Specify what access level each party has."
+        },
+        {
+          "id": "step2-sharing",
+          "type": "textarea",
+          "label": "Is data shared with anyone?",
+          "placeholder": "If yes, with whom and why?",
+          "required": false,
+          "description": "If personal data is transferred to third parties (vendors, partners, other organizations), describe with whom, for what purpose, and under what legal basis. Include any data transfer mechanisms (e.g., contracts, Standard Contractual Clauses)."
+        }
+      ]
+    },
+    {
+      "stepNumber": 3,
+      "stepTitle": "Consultation Process",
+      "stepDescription": "Identify who to consult and document their input",
+      "questions": [
+        {
+          "id": "step3-who",
+          "type": "textarea",
+          "label": "Who did you consult?",
+          "placeholder": "DPO, Security Team, Legal...",
+          "required": true,
+          "description": "List all stakeholders consulted during the DPIA process. This should include your Data Protection Officer, security and IT teams, legal department, business owners, and potentially data subjects if appropriate."
+        },
+        {
+          "id": "step3-how",
+          "type": "textarea",
+          "label": "How and when?",
+          "placeholder": "Meeting, email, workshop...",
+          "required": true,
+          "description": "Describe the consultation methods used (meetings, surveys, workshops, email) and provide dates. Document how feedback was collected and the level of engagement from each stakeholder."
+        },
+        {
+          "id": "step3-concerns",
+          "type": "textarea",
+          "label": "Their concerns & recommendations",
+          "placeholder": "Summarize stakeholder feedback...",
+          "required": false,
+          "description": "Summarize the key concerns, recommendations, and issues raised by stakeholders during consultation. Explain how these have been addressed in the DPIA."
+        }
+      ]
+    },
+    {
+      "stepNumber": 4,
+      "stepTitle": "Assess Necessity & Proportionality",
+      "stepDescription": "Ensure processing is justified and data-minimized",
+      "questions": [
+        {
+          "id": "step4-basis",
+          "type": "radio",
+          "label": "Lawful basis",
+          "required": true,
+          "options": [
+            {
+              "value": "consent",
+              "label": "Consent",
+              "description": "Explicit consent has been given by data subjects"
+            },
+            {
+              "value": "contract",
+              "label": "Contract",
+              "description": "Processing is necessary to perform a contract with the data subject"
+            },
+            {
+              "value": "legal",
+              "label": "Legal Obligation",
+              "description": "Processing is required by law or regulation"
+            },
+            {
+              "value": "legitimate",
+              "label": "Legitimate Interests",
+              "description": "Processing is necessary for legitimate business interests"
+            }
+          ],
+          "description": "Select the primary legal basis under GDPR Article 6 that justifies this processing. The lawful basis must be documented and communicated to data subjects."
+        },
+        {
+          "id": "step4-minimize",
+          "type": "textarea",
+          "label": "How are you minimizing data collection?",
+          "placeholder": "Only collecting necessary data? Anonymization? Retention limits?",
+          "required": true,
+          "description": "Explain how you apply data minimization principles: collecting only data that is necessary for the stated purpose, using anonymization or pseudonymization where possible, and limiting retention periods."
+        },
+        {
+          "id": "step4-rights",
+          "type": "checkbox",
+          "label": "How will you support individuals' rights?",
+          "required": false,
+          "options": [
+            {
+              "value": "access",
+              "label": "Right to Access"
+            },
+            {
+              "value": "deletion",
+              "label": "Right to Deletion"
+            },
+            {
+              "value": "portability",
+              "label": "Right to Portability"
+            }
+          ],
+          "description": "Identify which data subject rights you will support. At minimum, you must provide mechanisms for individuals to access their data and request deletion (right to erasure) where applicable."
+        }
+      ]
+    },
+    {
+      "stepNumber": 5,
+      "stepTitle": "Identify & Assess Risks",
+      "stepDescription": "List potential harms and assess likelihood and severity",
+      "questions": [
+        {
+          "id": "step5-risks",
+          "type": "table",
+          "label": "Risk Assessment Table",
+          "columns": [
+            {
+              "id": "risk-description",
+              "label": "Risk Description",
+              "description": "What is the potential harm or security/privacy incident?"
+            },
+            {
+              "id": "likelihood",
+              "label": "Likelihood",
+              "description": "How probable is this risk? (Remote, Possible, Probable)"
+            },
+            {
+              "id": "severity",
+              "label": "Severity",
+              "description": "How severe would the impact be if this occurred? (Minimal, Significant, Severe)"
+            },
+            {
+              "id": "overall",
+              "label": "Overall Risk",
+              "description": "Overall risk level combining likelihood and severity (Low, Medium, High)"
+            }
+          ],
+          "description": "Identify potential risks to individuals' rights and freedoms. Consider both deliberate attacks (e.g., data breaches) and accidental events (e.g., system failures). Assess each risk on likelihood and severity."
+        }
+      ]
+    },
+    {
+      "stepNumber": 6,
+      "stepTitle": "Identify Measures to Reduce Risk",
+      "stepDescription": "For each medium or high risk, add mitigation measures",
+      "questions": [
+        {
+          "id": "step6-mitigations",
+          "type": "table",
+          "label": "Risk Mitigation Table",
+          "columns": [
+            {
+              "id": "risk",
+              "label": "Risk",
+              "description": "Which risk from Step 5 are you addressing?"
+            },
+            {
+              "id": "measure",
+              "label": "Proposed Measure",
+              "description": "What technical, organizational, or legal control will you implement?"
+            },
+            {
+              "id": "effect",
+              "label": "Effect",
+              "description": "How does this measure reduce the risk?"
+            },
+            {
+              "id": "residual",
+              "label": "Residual Risk",
+              "description": "What risk remains after implementing this measure?"
+            },
+            {
+              "id": "timeline",
+              "label": "Timeline",
+              "description": "When will this measure be implemented?"
+            }
+          ],
+          "description": "For each medium or high risk identified in Step 5, propose specific measures to reduce it. Include technical controls (encryption, access controls), organizational controls (training, policies), and legal controls (contracts). Document the timeline for implementation."
+        }
+      ]
+    },
+    {
+      "stepNumber": 7,
+      "stepTitle": "Sign Off & Record Outcomes",
+      "stepDescription": "Get approval and finalize",
+      "questions": [
+        {
+          "section": "DPO Approval",
+          "id": "step7-dpo-name",
+          "type": "text",
+          "label": "DPO Name",
+          "required": true,
+          "description": "Full name of the Data Protection Officer providing approval"
+        },
+        {
+          "section": "DPO Approval",
+          "id": "step7-dpo-email",
+          "type": "email",
+          "label": "DPO Email",
+          "required": true,
+          "description": "Email address of the DPO for audit trail and future reference"
+        },
+        {
+          "section": "DPO Approval",
+          "id": "step7-dpo-advice",
+          "type": "textarea",
+          "label": "DPO Advice",
+          "placeholder": "Formal advice on DPIA",
+          "required": true,
+          "description": "The DPO's formal advice on the DPIA, including any concerns, recommendations, or conditions for processing to proceed"
+        },
+        {
+          "section": "Business Owner Approval",
+          "id": "step7-owner-name",
+          "type": "text",
+          "label": "Owner Name",
+          "required": true,
+          "description": "Full name of the business owner or senior manager approving this processing"
+        },
+        {
+          "section": "Business Owner Approval",
+          "id": "step7-owner-email",
+          "type": "email",
+          "label": "Owner Email",
+          "required": true,
+          "description": "Email address of the business owner for audit trail"
+        },
+        {
+          "section": "Business Owner Approval",
+          "id": "step7-risks",
+          "type": "radio",
+          "label": "Do you accept the residual risks?",
+          "required": false,
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "no",
+              "label": "No (escalate)"
+            }
+          ],
+          "description": "Confirm whether the business owner accepts any remaining risks after mitigation measures are implemented"
+        },
+        {
+          "section": "Final Decision",
+          "id": "step7-proceed",
+          "type": "radio",
+          "label": "Can processing proceed?",
+          "required": true,
+          "options": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "conditional",
+              "label": "Conditional"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            }
+          ],
+          "description": "The final decision on whether processing can proceed: Yes (unconditionally), Conditional (subject to implementing measures), or No (processing must not proceed)"
+        },
+        {
+          "section": "Final Decision",
+          "id": "step7-review",
+          "type": "date",
+          "label": "Next review date",
+          "required": true,
+          "description": "When will this DPIA be reviewed again? Typically annually or when processing scope changes significantly"
+        }
+      ]
+    }
+  ]
+}

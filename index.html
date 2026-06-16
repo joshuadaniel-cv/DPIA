@@ -448,6 +448,78 @@
       font-size: 0.85rem;
     }
 
+    /* ── Info Icon & Tooltip ─── */
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--accent-text);
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: help;
+      position: relative;
+      flex-shrink: 0;
+      transition: all 0.2s var(--ease);
+    }
+
+    .info-icon:hover {
+      background: var(--accent-hover);
+      transform: scale(1.1);
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: calc(100% + 0.75rem);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      max-width: 280px;
+      width: max-content;
+      color: var(--text);
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      pointer-events: none;
+      font-weight: 400;
+    }
+
+    .info-icon:hover .tooltip {
+      display: block;
+      animation: tooltipFade 0.2s var(--ease);
+    }
+
+    @keyframes tooltipFade {
+      from { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* Tooltip arrow */
+    .tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--bg-card);
+      border-bottom-width: 0;
+    }
+
     .recap-box p { margin: 0.3rem 0; }
     .recap-box strong { color: var(--accent); }
 
@@ -528,11 +600,19 @@
           </div>
           <form id="step1">
             <div class="form-section">
-              <label class="form-label">Project Title & Description <span class="required">*</span></label>
+              <label class="form-label">Project Title & Description <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Provide a clear title and description of your project. Include objectives, scope, and stakeholders involved.</div>
+                </span>
+              </label>
               <textarea class="form-textarea" id="step1-project" placeholder="What are you trying to achieve?" required></textarea>
             </div>
             <div class="form-section">
-              <label class="form-label">Why was a DPIA needed? <span class="required">*</span></label>
+              <label class="form-label">Why was a DPIA needed? <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Select the primary reason(s) under GDPR Article 35 that triggered the need for a DPIA. You may have multiple reasons.</div>
+                </span>
+              </label>
               <div class="option-group">
                 <label class="option-label"><input type="radio" name="step1-reason" value="high-risk" /><div><div class="option-value">High-risk processing</div></div></label>
                 <label class="option-label"><input type="radio" name="step1-reason" value="special-category" /><div><div class="option-value">Special category data</div></div></label>
@@ -541,7 +621,11 @@
               </div>
             </div>
             <div class="form-section">
-              <label class="form-label">Related Documents</label>
+              <label class="form-label">Related Documents
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Provide links to project documentation: proposal, security review, vendor security docs, classifier results, etc.</div>
+                </span>
+              </label>
               <input type="text" class="form-input" id="step1-docs" placeholder="Link to project proposal, etc." />
             </div>
             <div class="button-group">
@@ -565,19 +649,35 @@
           </div>
           <form id="step2">
             <div class="form-section">
-              <label class="form-label">Data Flow & Description <span class="required">*</span></label>
+              <label class="form-label">Data Flow & Description <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Describe the complete lifecycle: how data is collected, used, stored, and deleted. Include all systems and processes involved.</div>
+                </span>
+              </label>
               <textarea class="form-textarea" id="step2-flow" placeholder="How is data collected, used, stored, deleted?" required></textarea>
             </div>
             <div class="form-section">
-              <label class="form-label">Data Retention Period <span class="required">*</span></label>
+              <label class="form-label">Data Retention Period <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">How long will you keep this data? Base on legal requirements and business necessity. Shorter is better under data minimization.</div>
+                </span>
+              </label>
               <input type="text" class="form-input" id="step2-retention" placeholder="e.g., 7 years" required />
             </div>
             <div class="form-section">
-              <label class="form-label">Who has access? <span class="required">*</span></label>
+              <label class="form-label">Who has access? <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">List all parties with access: internal teams, external service providers, contractors, and third parties. Include their access level.</div>
+                </span>
+              </label>
               <textarea class="form-textarea" id="step2-access" placeholder="Internal teams, external processors, etc." required></textarea>
             </div>
             <div class="form-section">
-              <label class="form-label">Is data shared with anyone?</label>
+              <label class="form-label">Is data shared with anyone?
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">If data is transferred to third parties, describe with whom, for what purpose, and what legal safeguards exist.</div>
+                </span>
+              </label>
               <textarea class="form-textarea" id="step2-sharing" placeholder="If yes, with whom and why?"></textarea>
             </div>
             <div class="button-group">
@@ -598,15 +698,27 @@
           <div class="definition-box"><strong>Consultation:</strong> Who did you speak with? Include DPO, security, legal, data subjects, etc.</div>
           <form id="step3">
             <div class="form-section">
-              <label class="form-label">Who did you consult? <span class="required">*</span></label>
+              <label class="form-label">Who did you consult? <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">List all stakeholders: DPO, security team, legal, business owner, data subjects (if appropriate), and external parties.</div>
+                </span>
+              </label>
               <textarea class="form-textarea" id="step3-who" placeholder="DPO, Security Team, Legal..." required></textarea>
             </div>
             <div class="form-section">
-              <label class="form-label">How and when? <span class="required">*</span></label>
+              <label class="form-label">How and when? <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Describe the consultation methods (meeting, email, workshop) and dates. Document the engagement level and feedback mechanisms.</div>
+                </span>
+              </label>
               <textarea class="form-textarea" id="step3-how" placeholder="Meeting, email, workshop..." required></textarea>
             </div>
             <div class="form-section">
-              <label class="form-label">Their concerns & recommendations</label>
+              <label class="form-label">Their concerns & recommendations
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Summarize key concerns raised and recommendations made. Explain how you've addressed each concern.</div>
+                </span>
+              </label>
               <textarea class="form-textarea" id="step3-concerns" placeholder="Summarize stakeholder feedback..."></textarea>
             </div>
             <div class="button-group">
@@ -626,7 +738,11 @@
           </div>
           <form id="step4">
             <div class="form-section">
-              <label class="form-label">Lawful basis <span class="required">*</span></label>
+              <label class="form-label">Lawful basis <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Select the legal justification for processing under GDPR Article 6. This must be documented and disclosed to individuals.</div>
+                </span>
+              </label>
               <div class="option-group">
                 <label class="option-label"><input type="radio" name="step4-basis" value="consent" /><div><div class="option-value">Consent</div><div class="option-hint">Explicit consent given</div></div></label>
                 <label class="option-label"><input type="radio" name="step4-basis" value="contract" /><div><div class="option-value">Contract</div><div class="option-hint">Necessary for contract</div></div></label>
@@ -635,11 +751,19 @@
               </div>
             </div>
             <div class="form-section">
-              <label class="form-label">How are you minimizing data collection? <span class="required">*</span></label>
+              <label class="form-label">How are you minimizing data collection? <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Explain data minimization measures: only necessary data, anonymization, retention limits, access controls. This is a core GDPR principle.</div>
+                </span>
+              </label>
               <textarea class="form-textarea" id="step4-minimize" placeholder="Only collecting necessary data? Anonymization? Retention limits?" required></textarea>
             </div>
             <div class="form-section">
-              <label class="form-label">How will you support individuals' rights?</label>
+              <label class="form-label">How will you support individuals' rights?
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Select which data subject rights you'll support. At minimum: Right to Access and Right to Deletion where applicable.</div>
+                </span>
+              </label>
               <div class="option-group">
                 <label class="option-label"><input type="checkbox" name="step4-rights" value="access" /><div><div class="option-value">Right to Access</div></div></label>
                 <label class="option-label"><input type="checkbox" name="step4-rights" value="deletion" /><div><div class="option-value">Right to Deletion</div></div></label>
@@ -720,29 +844,53 @@
           <form id="step7">
             <h3 style="font-weight: 600; margin: 1.5rem 0 1rem; font-size: 1rem;">1. DPO Approval</h3>
             <div class="form-section">
-              <label class="form-label">DPO Name <span class="required">*</span></label>
+              <label class="form-label">DPO Name <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Full name of the Data Protection Officer providing approval. For audit trail purposes.</div>
+                </span>
+              </label>
               <input type="text" class="form-input" id="step7-dpo-name" required />
             </div>
             <div class="form-section">
-              <label class="form-label">DPO Email <span class="required">*</span></label>
+              <label class="form-label">DPO Email <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Email address of the DPO for audit trail and future reference.</div>
+                </span>
+              </label>
               <input type="email" class="form-input" id="step7-dpo-email" required />
             </div>
             <div class="form-section">
-              <label class="form-label">DPO Advice <span class="required">*</span></label>
+              <label class="form-label">DPO Advice <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Formal advice on GDPR compliance, risk mitigation adequacy, conditions for processing, and whether processing can proceed.</div>
+                </span>
+              </label>
               <textarea class="form-textarea" id="step7-dpo-advice" placeholder="Formal advice on DPIA" required></textarea>
             </div>
 
             <h3 style="font-weight: 600; margin: 1.5rem 0 1rem; font-size: 1rem;">2. Business Owner Approval</h3>
             <div class="form-section">
-              <label class="form-label">Owner Name <span class="required">*</span></label>
+              <label class="form-label">Owner Name <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Full name of the business owner or senior manager responsible for this processing and accepting residual risks.</div>
+                </span>
+              </label>
               <input type="text" class="form-input" id="step7-owner-name" required />
             </div>
             <div class="form-section">
-              <label class="form-label">Owner Email <span class="required">*</span></label>
+              <label class="form-label">Owner Email <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Email address of the business owner for audit trail purposes.</div>
+                </span>
+              </label>
               <input type="email" class="form-input" id="step7-owner-email" required />
             </div>
             <div class="form-section">
-              <label class="form-label">Do you accept the residual risks?</label>
+              <label class="form-label">Do you accept the residual risks?
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Confirm formal acceptance of any risks remaining after mitigation measures are implemented. Select No to escalate unacceptable risks.</div>
+                </span>
+              </label>
               <div class="option-group">
                 <label class="option-label"><input type="radio" name="step7-risks" value="yes" /><div><div class="option-value">Yes</div></div></label>
                 <label class="option-label"><input type="radio" name="step7-risks" value="no" /><div><div class="option-value">No (escalate)</div></div></label>
@@ -751,7 +899,11 @@
 
             <h3 style="font-weight: 600; margin: 1.5rem 0 1rem; font-size: 1rem;">3. Final Decision</h3>
             <div class="form-section">
-              <label class="form-label">Can processing proceed? <span class="required">*</span></label>
+              <label class="form-label">Can processing proceed? <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">Final decision: Yes (unconditional), Conditional (subject to implementing measures), or No (processing cannot proceed).</div>
+                </span>
+              </label>
               <div class="option-group">
                 <label class="option-label"><input type="radio" name="step7-proceed" value="yes" required /><div><div class="option-value">Yes</div></div></label>
                 <label class="option-label"><input type="radio" name="step7-proceed" value="conditional" /><div><div class="option-value">Conditional</div></div></label>
@@ -759,7 +911,11 @@
               </div>
             </div>
             <div class="form-section">
-              <label class="form-label">Next review date <span class="required">*</span></label>
+              <label class="form-label">Next review date <span class="required">*</span>
+                <span class="info-icon">ⓘ
+                  <div class="tooltip">When will this DPIA be reviewed again? Typically annual, or when processing scope changes significantly.</div>
+                </span>
+              </label>
               <input type="date" class="form-input" id="step7-review" required />
             </div>
 
