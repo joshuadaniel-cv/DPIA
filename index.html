@@ -4,17 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CV DPIA Tool — Coming Soon</title>
-  <meta name="description" content="Data Protection Impact Assessment tool for CV Global — coming soon">
+  <title>CV DPIA Tool</title>
+  <meta name="description" content="Data Protection Impact Assessment tool for CV Global">
 
-  <!-- StaticCrypt for password protection -->
-  <script src="https://cdn.jsdelivr.net/npm/libsodium.js@0.7.10/dist/browsers-combined/libsodium.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/staticrypt@2.3.0/staticrypt.js"></script>
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1466.1 699.15'%3E%3Cpath d='m1168.42 233.05c-13.36 0-26.18 5.31-35.63 14.76l-140 140c-11.49 11.49-26.77 17.82-43.03 17.82s-31.53-6.33-43.03-17.82l-107.98-107.98c-30.17-30.17-70.28-46.78-112.95-46.78h-333.37c-63.1 0-116.92 48.98-119.3 112.03-2.5 66.29 50.7 121.02 116.44 121.02h388.1l-45.61-45.61c-9.51-9.51-22.41-14.85-35.86-14.85h-304.98c-29.18 0-54.72-21.61-57.45-50.66-3.14-33.33 23.11-61.46 55.8-61.46h336.23c26.33 0 51.58 10.46 70.2 29.08l106.19 106.19c22.22 22.22 51.81 36.15 83.22 37.24 34.02 1.18 66.2-11.52 90.13-35.46l197.51-197.51h-64.63z'/%3E%3C/svg%3E">
 
   <style>
-    /* ── Brand Tokens (matching data-classifier) ─── */
+    /* ── Brand Tokens ─── */
     :root {
       --black: #000000;
       --white: #FFFFFF;
@@ -29,10 +26,12 @@
     [data-theme="dark"] {
       --bg: #000000;
       --bg-card: #111111;
+      --bg-card-hover: #1a1a1a;
       --text: #FFFFFF;
       --text-muted: #999999;
       --border: #222222;
       --accent: var(--green-light);
+      --accent-hover: var(--green-mid);
       --accent-text: #000000;
       --badge-bg: rgba(168, 255, 163, 0.1);
       --badge-border: rgba(168, 255, 163, 0.25);
@@ -41,13 +40,31 @@
     [data-theme="light"] {
       --bg: #FFFFFF;
       --bg-card: #F7F7F7;
+      --bg-card-hover: #EEEEEE;
       --text: #000000;
       --text-muted: #666666;
       --border: #E0E0E0;
       --accent: var(--green-dark);
+      --accent-hover: #00a800;
       --accent-text: #FFFFFF;
       --badge-bg: rgba(0, 194, 0, 0.08);
       --badge-border: rgba(0, 194, 0, 0.25);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html { font-size: 16px; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.3s var(--ease), color 0.3s var(--ease);
     }
 
     /* ── Password Protection ─── */
@@ -62,7 +79,6 @@
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      transition: opacity 0.3s var(--ease);
     }
 
     .password-overlay.hidden {
@@ -82,7 +98,6 @@
       font-size: 1.5rem;
       font-weight: 700;
       margin-bottom: 0.5rem;
-      color: var(--text);
     }
 
     .password-subtitle {
@@ -90,10 +105,6 @@
       color: var(--text-muted);
       margin-bottom: 2rem;
       line-height: 1.5;
-    }
-
-    .password-input-group {
-      margin-bottom: 1.5rem;
     }
 
     .password-input {
@@ -105,6 +116,7 @@
       color: var(--text);
       font-size: 1rem;
       font-family: inherit;
+      margin-bottom: 1.5rem;
       transition: border-color 0.2s var(--ease);
     }
 
@@ -112,10 +124,6 @@
       outline: none;
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(168, 255, 163, 0.1);
-    }
-
-    .password-input::placeholder {
-      color: var(--text-muted);
     }
 
     .password-button {
@@ -133,12 +141,8 @@
     }
 
     .password-button:hover {
-      background: var(--accent-hover) != var(--accent) ? var(--accent-hover) : var(--accent);
+      background: var(--accent-hover);
       transform: translateY(-2px);
-    }
-
-    .password-button:active {
-      transform: translateY(0);
     }
 
     .password-error {
@@ -152,39 +156,17 @@
       display: block;
     }
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html { font-size: 16px; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.3s var(--ease), color 0.3s var(--ease);
-    }
-
-    /* ── Header bar ─────────────────────────────── */
+    /* ── Header ─── */
     .top-bar {
-      position: fixed;
+      position: sticky;
       top: 0;
-      left: 0;
-      right: 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 1rem 1.5rem;
       border-bottom: 1px solid var(--border);
       background: var(--bg);
-      z-index: 10;
+      z-index: 100;
     }
 
     .logo-wrap {
@@ -193,16 +175,8 @@
       gap: 0.75rem;
     }
 
-    .logo {
-      height: 28px;
-      width: auto;
-    }
-
-    .logo-label {
-      font-size: 0.9rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-    }
+    .logo { height: 28px; width: auto; }
+    .logo-label { font-size: 0.9rem; font-weight: 700; }
 
     .theme-toggle {
       background: var(--bg-card);
@@ -215,80 +189,31 @@
       justify-content: center;
       cursor: pointer;
       transition: all 0.2s var(--ease);
-      color: var(--text);
       font-size: 1rem;
     }
 
-    .theme-toggle:hover {
-      border-color: var(--accent);
-    }
+    .theme-toggle:hover { border-color: var(--accent); }
 
-    /* ── Hero ───────────────────────────────────── */
-    .hero {
-      text-align: center;
-      max-width: 560px;
+    /* ── Main Layout ─── */
+    .layout {
+      display: flex;
+      gap: 2rem;
       padding: 2rem 1.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
     }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.35rem 0.9rem;
-      background: var(--badge-bg);
-      border: 1px solid var(--badge-border);
-      border-radius: 100px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--accent);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-bottom: 1.75rem;
+    .minimap {
+      position: sticky;
+      top: 80px;
+      width: 200px;
+      flex-shrink: 0;
+      height: fit-content;
     }
 
-    .badge-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    h1 {
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.1;
-      margin-bottom: 1rem;
-    }
-
-    h1 span {
-      color: var(--accent);
-    }
-
-    .subtitle {
-      font-size: 1rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-      margin-bottom: 2.5rem;
-    }
-
-    /* ── Info card ──────────────────────────────── */
-    .info-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      text-align: left;
-    }
-
-    .info-card-title {
-      font-size: 0.75rem;
+    .minimap-title {
+      font-size: 0.65rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.06em;
@@ -296,272 +221,716 @@
       margin-bottom: 1rem;
     }
 
-    .info-row {
+    .minimap-node {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      text-decoration: none;
+      border: 1px solid transparent;
+    }
+
+    .minimap-node:hover { color: var(--text); background: var(--bg-card); }
+    .minimap-node.active { color: var(--accent); font-weight: 700; background: rgba(168, 255, 163, 0.05); border-color: var(--accent); }
+    .minimap-node.completed { color: var(--accent); }
+
+    .minimap-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      transition: all 0.2s var(--ease);
+    }
+
+    .minimap-node.active .minimap-dot,
+    .minimap-node.completed .minimap-dot {
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+
+    .minimap-line {
+      width: 2px;
+      height: 12px;
+      background: var(--border);
+      margin-left: 4.5px;
+      transition: background 0.2s var(--ease);
+    }
+
+    .minimap-line.completed { background: var(--accent); }
+
+    .main-content {
+      flex: 1;
+      max-width: 800px;
+    }
+
+    .form-container { display: none; }
+    .form-container.active { display: block; }
+
+    .step-header { margin-bottom: 2rem; }
+    .step-number { font-size: 0.75rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    .step-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+    .step-subtitle { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; }
+
+    .definition-box {
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      border-radius: var(--radius-sm);
+      padding: 1.25rem;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      margin: 1.5rem 0;
+    }
+
+    .definition-box strong { color: var(--accent); font-weight: 700; }
+
+    .form-section { margin-bottom: 2rem; }
+    .form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+    .required { color: #FF3C3C; }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: all 0.2s var(--ease);
+      margin-bottom: 1rem;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(168, 255, 163, 0.1);
+    }
+
+    .form-textarea { resize: vertical; min-height: 100px; }
+
+    .option-group { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1rem; }
+
+    .option-label {
       display: flex;
       align-items: flex-start;
       gap: 0.75rem;
-      padding: 0.65rem 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .info-row:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-
-    .info-row:first-of-type {
-      padding-top: 0;
-    }
-
-    .info-icon {
-      width: 32px;
-      height: 32px;
+      padding: 0.85rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      background: var(--badge-bg);
-      border: 1px solid var(--badge-border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+    }
+
+    .option-label:hover { background: var(--bg-card-hover); border-color: var(--accent); }
+    .option-label.selected { background: var(--badge-bg); border-color: var(--accent); }
+
+    .option-input {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      cursor: pointer;
+      accent-color: var(--accent);
       flex-shrink: 0;
     }
 
-    .info-icon svg {
-      width: 15px;
-      height: 15px;
-      stroke: var(--accent);
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
+    .option-value { font-weight: 600; font-size: 0.95rem; }
+    .option-hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
 
-    .info-text strong {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 0.1rem;
-    }
-
-    .info-text span {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    /* ── Footer ─────────────────────────────────── */
-    .footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      border-top: 1px solid var(--border);
+    .risk-table {
       background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
     }
 
-    .footer a {
+    .risk-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+      gap: 1rem;
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+    }
+
+    .risk-row:last-child { border-bottom: none; }
+    .risk-row.header { background: var(--bg-card); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); }
+
+    .risk-cell-input {
+      width: 100%;
+      padding: 0.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-size: 0.85rem;
+    }
+
+    .risk-delete-btn {
+      padding: 0.4rem 0.8rem;
+      background: rgba(255, 60, 60, 0.1);
+      border: 1px solid rgba(255, 60, 60, 0.25);
+      color: #FF3C3C;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: all 0.2s var(--ease);
+    }
+
+    .risk-delete-btn:hover { background: rgba(255, 60, 60, 0.2); }
+
+    .add-row-btn {
+      padding: 0.75rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
       color: var(--accent);
-      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      margin-bottom: 1.5rem;
     }
 
-    .footer a:hover {
-      text-decoration: underline;
+    .add-row-btn:hover { background: var(--bg-card-hover); border-color: var(--accent); }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      background: var(--accent);
+      color: var(--accent-text);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+    }
+
+    .btn:hover:not(:disabled) { background: var(--accent-hover); transform: translateY(-2px); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover:not(:disabled) { background: var(--bg-card-hover); border-color: var(--accent); }
+
+    .status-message { font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem; }
+
+    .recap-box {
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+    }
+
+    .recap-box p { margin: 0.3rem 0; }
+    .recap-box strong { color: var(--accent); }
+
+    @media (max-width: 900px) {
+      .layout { flex-direction: column; gap: 1.5rem; }
+      .minimap { position: static; width: 100%; top: auto; }
+      .main-content { max-width: 100%; }
+      .risk-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Password Protection Overlay -->
+  <!-- Password Protection -->
   <div class="password-overlay" id="passwordOverlay">
     <div class="password-container">
       <div class="password-title">🔐 Access Required</div>
-      <p class="password-subtitle">This DPIA tool is protected. Please enter the passcode to continue.</p>
-      <div class="password-input-group">
-        <input
-          type="password"
-          id="passwordInput"
-          class="password-input"
-          placeholder="Enter passcode"
-          aria-label="Enter passcode"
-        />
-      </div>
+      <p class="password-subtitle">This DPIA tool is protected. Please enter the passcode.</p>
+      <input type="password" id="passwordInput" class="password-input" placeholder="Enter passcode" />
       <button class="password-button" id="passwordButton">Unlock</button>
       <div class="password-error" id="passwordError">Incorrect passcode. Please try again.</div>
     </div>
   </div>
 
-  <!-- Main Content (hidden until authenticated) -->
-  <div id="mainContent" style="display: none;">
+  <!-- Main App -->
+  <div id="mainApp" style="display: none;">
 
-  <!-- Top bar -->
-  <header class="top-bar">
-    <div class="logo-wrap">
-      <svg id="logo-dark" class="logo" enable-background="new 0 0 1466.1 699.15" viewBox="0 0 1466.1 699.15"
-        xmlns="http://www.w3.org/2000/svg" style="display:none">
-        <path
-          d="m1168.42 233.05c-13.36 0-26.18 5.31-35.63 14.76l-140 140c-11.49 11.49-26.77 17.82-43.03 17.82s-31.53-6.33-43.03-17.82l-107.98-107.98c-30.17-30.17-70.28-46.78-112.95-46.78h-333.37c-63.1 0-116.92 48.98-119.3 112.03-2.5 66.29 50.7 121.02 116.44 121.02h388.1l-45.61-45.61c-9.51-9.51-22.41-14.85-35.86-14.85h-304.98c-29.18 0-54.72-21.61-57.45-50.66-3.14-33.33 23.11-61.46 55.8-61.46h336.23c26.33 0 51.58 10.46 70.2 29.08l106.19 106.19c22.22 22.22 51.81 36.15 83.22 37.24 34.02 1.18 66.2-11.52 90.13-35.46l197.51-197.51h-64.63z"
-          fill="#fff" />
-      </svg>
-      <svg id="logo-light" class="logo" enable-background="new 0 0 1466.1 699.15" viewBox="0 0 1466.1 699.15"
-        xmlns="http://www.w3.org/2000/svg" style="display:none">
-        <path
-          d="m1168.42 233.05c-13.36 0-26.18 5.31-35.63 14.76l-140 140c-11.49 11.49-26.77 17.82-43.03 17.82s-31.53-6.33-43.03-17.82l-107.98-107.98c-30.17-30.17-70.28-46.78-112.95-46.78h-333.37c-63.1 0-116.92 48.98-119.3 112.03-2.5 66.29 50.7 121.02 116.44 121.02h388.1l-45.61-45.61c-9.51-9.51-22.41-14.85-35.86-14.85h-304.98c-29.18 0-54.72-21.61-57.45-50.66-3.14-33.33 23.11-61.46 55.8-61.46h336.23c26.33 0 51.58 10.46 70.2 29.08l106.19 106.19c22.22 22.22 51.81 36.15 83.22 37.24 34.02 1.18 66.2-11.52 90.13-35.46l197.51-197.51h-64.63z"
-          fill="#000" />
-      </svg>
-      <span class="logo-label">CV Global</span>
-    </div>
-    <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
-      <span id="theme-icon">&#x2600;</span>
-    </button>
-  </header>
-
-  <!-- Hero -->
-  <main class="hero">
-    <div class="badge">
-      <span class="badge-dot"></span>
-      In Development
-    </div>
-
-    <h1>DPIA <span>Coming Soon</span></h1>
-
-    <p class="subtitle">
-      The Data Protection Impact Assessment tool is on its way —
-      helping you meet GDPR Article 35 requirements with a guided, structured workflow.
-    </p>
-
-    <div class="info-card">
-      <div class="info-card-title">What to expect</div>
-
-      <div class="info-row">
-        <div class="info-icon">
-          <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
-        </div>
-        <div class="info-text">
-          <strong>GDPR Art. 35 Compliance</strong>
-          <span>Structured impact assessments for high-risk processing activities</span>
-        </div>
+    <!-- Header -->
+    <header class="top-bar">
+      <div class="logo-wrap">
+        <svg id="logo-dark" class="logo" viewBox="0 0 1466.1 699.15" xmlns="http://www.w3.org/2000/svg" style="display:none">
+          <path d="m1168.42 233.05c-13.36 0-26.18 5.31-35.63 14.76l-140 140c-11.49 11.49-26.77 17.82-43.03 17.82s-31.53-6.33-43.03-17.82l-107.98-107.98c-30.17-30.17-70.28-46.78-112.95-46.78h-333.37c-63.1 0-116.92 48.98-119.3 112.03-2.5 66.29 50.7 121.02 116.44 121.02h388.1l-45.61-45.61c-9.51-9.51-22.41-14.85-35.86-14.85h-304.98c-29.18 0-54.72-21.61-57.45-50.66-3.14-33.33 23.11-61.46 55.8-61.46h336.23c26.33 0 51.58 10.46 70.2 29.08l106.19 106.19c22.22 22.22 51.81 36.15 83.22 37.24 34.02 1.18 66.2-11.52 90.13-35.46l197.51-197.51h-64.63z" fill="#fff" />
+        </svg>
+        <svg id="logo-light" class="logo" viewBox="0 0 1466.1 699.15" xmlns="http://www.w3.org/2000/svg" style="display:none">
+          <path d="m1168.42 233.05c-13.36 0-26.18 5.31-35.63 14.76l-140 140c-11.49 11.49-26.77 17.82-43.03 17.82s-31.53-6.33-43.03-17.82l-107.98-107.98c-30.17-30.17-70.28-46.78-112.95-46.78h-333.37c-63.1 0-116.92 48.98-119.3 112.03-2.5 66.29 50.7 121.02 116.44 121.02h388.1l-45.61-45.61c-9.51-9.51-22.41-14.85-35.86-14.85h-304.98c-29.18 0-54.72-21.61-57.45-50.66-3.14-33.33 23.11-61.46 55.8-61.46h336.23c26.33 0 51.58 10.46 70.2 29.08l106.19 106.19c22.22 22.22 51.81 36.15 83.22 37.24 34.02 1.18 66.2-11.52 90.13-35.46l197.51-197.51h-64.63z" fill="#000" />
+        </svg>
+        <span class="logo-label">CV Global</span>
       </div>
+      <button class="theme-toggle" id="theme-toggle">☀️</button>
+    </header>
 
-      <div class="info-row">
-        <div class="info-icon">
-          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-        </div>
-        <div class="info-text">
-          <strong>Privacy by Design</strong>
-          <span>Built-in guidance on embedding privacy controls from the ground up</span>
-        </div>
-      </div>
+    <!-- Layout -->
+    <div class="layout">
 
-      <div class="info-row">
-        <div class="info-icon">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      <!-- Minimap -->
+      <nav class="minimap">
+        <div class="minimap-title">Progress</div>
+        <a class="minimap-node" onclick="goToStep(1)"><div class="minimap-dot"></div>Identify Need</a>
+        <div class="minimap-line"></div>
+        <a class="minimap-node" onclick="goToStep(2)"><div class="minimap-dot"></div>Describe Processing</a>
+        <div class="minimap-line"></div>
+        <a class="minimap-node" onclick="goToStep(3)"><div class="minimap-dot"></div>Consultation</a>
+        <div class="minimap-line"></div>
+        <a class="minimap-node" onclick="goToStep(4)"><div class="minimap-dot"></div>Assess Necessity</a>
+        <div class="minimap-line"></div>
+        <a class="minimap-node" onclick="goToStep(5)"><div class="minimap-dot"></div>Identify Risks</a>
+        <div class="minimap-line"></div>
+        <a class="minimap-node" onclick="goToStep(6)"><div class="minimap-dot"></div>Mitigation</a>
+        <div class="minimap-line"></div>
+        <a class="minimap-node" onclick="goToStep(7)"><div class="minimap-dot"></div>Sign Off</a>
+      </nav>
+
+      <!-- Content -->
+      <div class="main-content">
+
+        <!-- STEP 1 -->
+        <div class="form-container active" data-step="1">
+          <div class="step-header">
+            <div class="step-number">Step 1 of 7</div>
+            <h1 class="step-title">Identify the Need for a DPIA</h1>
+            <p class="step-subtitle">Explaining why this DPIA matters and who is responsible</p>
+          </div>
+          <div class="recap-box">
+            <p><strong>Managing Group:</strong> Data & Insights</p>
+            <p><strong>Source Owner:</strong> john.doe@cvglobal.co</p>
+            <p><strong>Source Name:</strong> Employee Payroll System</p>
+          </div>
+          <form id="step1">
+            <div class="form-section">
+              <label class="form-label">Project Title & Description <span class="required">*</span></label>
+              <textarea class="form-textarea" id="step1-project" placeholder="What are you trying to achieve?" required></textarea>
+            </div>
+            <div class="form-section">
+              <label class="form-label">Why was a DPIA needed? <span class="required">*</span></label>
+              <div class="option-group">
+                <label class="option-label"><input type="radio" name="step1-reason" value="high-risk" /><div><div class="option-value">High-risk processing</div></div></label>
+                <label class="option-label"><input type="radio" name="step1-reason" value="special-category" /><div><div class="option-value">Special category data</div></div></label>
+                <label class="option-label"><input type="radio" name="step1-reason" value="large-scale" /><div><div class="option-value">Large-scale processing</div></div></label>
+                <label class="option-label"><input type="radio" name="step1-reason" value="children" /><div><div class="option-value">Processing involves children</div></div></label>
+              </div>
+            </div>
+            <div class="form-section">
+              <label class="form-label">Related Documents</label>
+              <input type="text" class="form-input" id="step1-docs" placeholder="Link to project proposal, etc." />
+            </div>
+            <div class="button-group">
+              <button type="button" class="btn btn-secondary" disabled>← Previous</button>
+              <button type="button" class="btn" onclick="saveAndNext(1)">Next →</button>
+            </div>
+            <div class="status-message">Auto-saving...</div>
+          </form>
         </div>
-        <div class="info-text">
-          <strong>Integrates with Data Classifier</strong>
-          <span>Works alongside the existing classification tool for end-to-end data governance</span>
+
+        <!-- STEP 2 -->
+        <div class="form-container" data-step="2">
+          <div class="step-header">
+            <div class="step-number">Step 2 of 7</div>
+            <h1 class="step-title">Describe the Processing</h1>
+            <p class="step-subtitle">How you collect, use, store, and delete data</p>
+          </div>
+          <div class="recap-box">
+            <p><strong>Confidentiality:</strong> High | <strong>Integrity:</strong> High | <strong>Availability:</strong> Medium</p>
+            <p><strong>Contains PII:</strong> Yes | <strong>Special Category:</strong> No</p>
+          </div>
+          <form id="step2">
+            <div class="form-section">
+              <label class="form-label">Data Flow & Description <span class="required">*</span></label>
+              <textarea class="form-textarea" id="step2-flow" placeholder="How is data collected, used, stored, deleted?" required></textarea>
+            </div>
+            <div class="form-section">
+              <label class="form-label">Data Retention Period <span class="required">*</span></label>
+              <input type="text" class="form-input" id="step2-retention" placeholder="e.g., 7 years" required />
+            </div>
+            <div class="form-section">
+              <label class="form-label">Who has access? <span class="required">*</span></label>
+              <textarea class="form-textarea" id="step2-access" placeholder="Internal teams, external processors, etc." required></textarea>
+            </div>
+            <div class="form-section">
+              <label class="form-label">Is data shared with anyone?</label>
+              <textarea class="form-textarea" id="step2-sharing" placeholder="If yes, with whom and why?"></textarea>
+            </div>
+            <div class="button-group">
+              <button type="button" class="btn btn-secondary" onclick="goToStep(1)">← Previous</button>
+              <button type="button" class="btn" onclick="saveAndNext(2)">Next →</button>
+            </div>
+            <div class="status-message">Auto-saving...</div>
+          </form>
         </div>
+
+        <!-- STEP 3 -->
+        <div class="form-container" data-step="3">
+          <div class="step-header">
+            <div class="step-number">Step 3 of 7</div>
+            <h1 class="step-title">Consultation Process</h1>
+            <p class="step-subtitle">Identify who to consult and document their input</p>
+          </div>
+          <div class="definition-box"><strong>Consultation:</strong> Who did you speak with? Include DPO, security, legal, data subjects, etc.</div>
+          <form id="step3">
+            <div class="form-section">
+              <label class="form-label">Who did you consult? <span class="required">*</span></label>
+              <textarea class="form-textarea" id="step3-who" placeholder="DPO, Security Team, Legal..." required></textarea>
+            </div>
+            <div class="form-section">
+              <label class="form-label">How and when? <span class="required">*</span></label>
+              <textarea class="form-textarea" id="step3-how" placeholder="Meeting, email, workshop..." required></textarea>
+            </div>
+            <div class="form-section">
+              <label class="form-label">Their concerns & recommendations</label>
+              <textarea class="form-textarea" id="step3-concerns" placeholder="Summarize stakeholder feedback..."></textarea>
+            </div>
+            <div class="button-group">
+              <button type="button" class="btn btn-secondary" onclick="goToStep(2)">← Previous</button>
+              <button type="button" class="btn" onclick="saveAndNext(3)">Next →</button>
+            </div>
+            <div class="status-message">Auto-saving...</div>
+          </form>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="form-container" data-step="4">
+          <div class="step-header">
+            <div class="step-number">Step 4 of 7</div>
+            <h1 class="step-title">Assess Necessity & Proportionality</h1>
+            <p class="step-subtitle">Ensure processing is justified and data-minimized</p>
+          </div>
+          <form id="step4">
+            <div class="form-section">
+              <label class="form-label">Lawful basis <span class="required">*</span></label>
+              <div class="option-group">
+                <label class="option-label"><input type="radio" name="step4-basis" value="consent" /><div><div class="option-value">Consent</div><div class="option-hint">Explicit consent given</div></div></label>
+                <label class="option-label"><input type="radio" name="step4-basis" value="contract" /><div><div class="option-value">Contract</div><div class="option-hint">Necessary for contract</div></div></label>
+                <label class="option-label"><input type="radio" name="step4-basis" value="legal" /><div><div class="option-value">Legal Obligation</div><div class="option-hint">Required by law</div></div></label>
+                <label class="option-label"><input type="radio" name="step4-basis" value="legitimate" /><div><div class="option-value">Legitimate Interests</div><div class="option-hint">For business interests</div></div></label>
+              </div>
+            </div>
+            <div class="form-section">
+              <label class="form-label">How are you minimizing data collection? <span class="required">*</span></label>
+              <textarea class="form-textarea" id="step4-minimize" placeholder="Only collecting necessary data? Anonymization? Retention limits?" required></textarea>
+            </div>
+            <div class="form-section">
+              <label class="form-label">How will you support individuals' rights?</label>
+              <div class="option-group">
+                <label class="option-label"><input type="checkbox" name="step4-rights" value="access" /><div><div class="option-value">Right to Access</div></div></label>
+                <label class="option-label"><input type="checkbox" name="step4-rights" value="deletion" /><div><div class="option-value">Right to Deletion</div></div></label>
+                <label class="option-label"><input type="checkbox" name="step4-rights" value="portability" /><div><div class="option-value">Right to Portability</div></div></label>
+              </div>
+            </div>
+            <div class="button-group">
+              <button type="button" class="btn btn-secondary" onclick="goToStep(3)">← Previous</button>
+              <button type="button" class="btn" onclick="saveAndNext(4)">Next →</button>
+            </div>
+            <div class="status-message">Auto-saving...</div>
+          </form>
+        </div>
+
+        <!-- STEP 5 -->
+        <div class="form-container" data-step="5">
+          <div class="step-header">
+            <div class="step-number">Step 5 of 7</div>
+            <h1 class="step-title">Identify & Assess Risks</h1>
+            <p class="step-subtitle">List potential harms and assess likelihood and severity</p>
+          </div>
+          <form id="step5">
+            <button type="button" class="add-row-btn" onclick="addRiskRow()">+ Add Risk</button>
+            <div class="risk-table">
+              <div class="risk-row header">
+                <div>Risk Description</div>
+                <div>Likelihood</div>
+                <div>Severity</div>
+                <div>Overall</div>
+                <div></div>
+                <div></div>
+              </div>
+              <div id="riskTable"></div>
+            </div>
+            <div class="button-group">
+              <button type="button" class="btn btn-secondary" onclick="goToStep(4)">← Previous</button>
+              <button type="button" class="btn" onclick="saveAndNext(5)">Next →</button>
+            </div>
+            <div class="status-message">Auto-saving...</div>
+          </form>
+        </div>
+
+        <!-- STEP 6 -->
+        <div class="form-container" data-step="6">
+          <div class="step-header">
+            <div class="step-number">Step 6 of 7</div>
+            <h1 class="step-title">Identify Measures to Reduce Risk</h1>
+            <p class="step-subtitle">For each medium or high risk, add mitigation measures</p>
+          </div>
+          <form id="step6">
+            <button type="button" class="add-row-btn" onclick="addMitigationRow()">+ Add Mitigation</button>
+            <div class="risk-table">
+              <div class="risk-row header">
+                <div>Risk</div>
+                <div>Proposed Measure</div>
+                <div>Effect</div>
+                <div>Residual</div>
+                <div>Timeline</div>
+                <div></div>
+              </div>
+              <div id="mitigationTable"></div>
+            </div>
+            <div class="button-group">
+              <button type="button" class="btn btn-secondary" onclick="goToStep(5)">← Previous</button>
+              <button type="button" class="btn" onclick="saveAndNext(6)">Next →</button>
+            </div>
+            <div class="status-message">Auto-saving...</div>
+          </form>
+        </div>
+
+        <!-- STEP 7 -->
+        <div class="form-container" data-step="7">
+          <div class="step-header">
+            <div class="step-number">Step 7 of 7</div>
+            <h1 class="step-title">Sign Off & Record Outcomes</h1>
+            <p class="step-subtitle">Get approval and finalize</p>
+          </div>
+          <form id="step7">
+            <h3 style="font-weight: 600; margin: 1.5rem 0 1rem; font-size: 1rem;">1. DPO Approval</h3>
+            <div class="form-section">
+              <label class="form-label">DPO Name <span class="required">*</span></label>
+              <input type="text" class="form-input" id="step7-dpo-name" required />
+            </div>
+            <div class="form-section">
+              <label class="form-label">DPO Email <span class="required">*</span></label>
+              <input type="email" class="form-input" id="step7-dpo-email" required />
+            </div>
+            <div class="form-section">
+              <label class="form-label">DPO Advice <span class="required">*</span></label>
+              <textarea class="form-textarea" id="step7-dpo-advice" placeholder="Formal advice on DPIA" required></textarea>
+            </div>
+
+            <h3 style="font-weight: 600; margin: 1.5rem 0 1rem; font-size: 1rem;">2. Business Owner Approval</h3>
+            <div class="form-section">
+              <label class="form-label">Owner Name <span class="required">*</span></label>
+              <input type="text" class="form-input" id="step7-owner-name" required />
+            </div>
+            <div class="form-section">
+              <label class="form-label">Owner Email <span class="required">*</span></label>
+              <input type="email" class="form-input" id="step7-owner-email" required />
+            </div>
+            <div class="form-section">
+              <label class="form-label">Do you accept the residual risks?</label>
+              <div class="option-group">
+                <label class="option-label"><input type="radio" name="step7-risks" value="yes" /><div><div class="option-value">Yes</div></div></label>
+                <label class="option-label"><input type="radio" name="step7-risks" value="no" /><div><div class="option-value">No (escalate)</div></div></label>
+              </div>
+            </div>
+
+            <h3 style="font-weight: 600; margin: 1.5rem 0 1rem; font-size: 1rem;">3. Final Decision</h3>
+            <div class="form-section">
+              <label class="form-label">Can processing proceed? <span class="required">*</span></label>
+              <div class="option-group">
+                <label class="option-label"><input type="radio" name="step7-proceed" value="yes" required /><div><div class="option-value">Yes</div></div></label>
+                <label class="option-label"><input type="radio" name="step7-proceed" value="conditional" /><div><div class="option-value">Conditional</div></div></label>
+                <label class="option-label"><input type="radio" name="step7-proceed" value="no" /><div><div class="option-value">No</div></div></label>
+              </div>
+            </div>
+            <div class="form-section">
+              <label class="form-label">Next review date <span class="required">*</span></label>
+              <input type="date" class="form-input" id="step7-review" required />
+            </div>
+
+            <div class="button-group">
+              <button type="button" class="btn btn-secondary" onclick="goToStep(6)">← Previous</button>
+              <button type="button" class="btn" onclick="completeDPIA()">Complete DPIA ✓</button>
+            </div>
+            <div class="status-message">All information saved</div>
+          </form>
+        </div>
+
       </div>
     </div>
-  </main>
 
-  <!-- Footer -->
-  <footer class="footer">
-    CV Global &middot; Data Governance Suite &middot;
-    Questions? <a href="mailto:uk.privacy@cvglobal.co">uk.privacy@cvglobal.co</a>
-  </footer>
-
-  </div><!-- End mainContent -->
+  </div>
 
   <script>
-    // ── Password Protection ──────────────────────────────
-    const CORRECT_PASSCODE = 'test';
+    const PASSCODE = 'test';
+    let currentStep = 1;
+    let formData = {};
 
-    function checkAuthentication() {
-      const isAuthenticated = sessionStorage.getItem('dpia-authenticated') === 'true';
-      return isAuthenticated;
-    }
-
-    function authenticateUser(passcode) {
-      if (passcode === CORRECT_PASSCODE) {
-        sessionStorage.setItem('dpia-authenticated', 'true');
+    // Password
+    function checkAuth() { return sessionStorage.getItem('dpia-auth') === 'true'; }
+    function authenticate(pass) {
+      if (pass === PASSCODE) {
+        sessionStorage.setItem('dpia-auth', 'true');
         return true;
       }
       return false;
     }
 
-    function showMainContent() {
-      document.getElementById('passwordOverlay').classList.add('hidden');
-      document.getElementById('mainContent').style.display = 'block';
-      initTheme();
-    }
-
-    function handlePasswordSubmit() {
-      const passcode = document.getElementById('passwordInput').value;
-      const errorEl = document.getElementById('passwordError');
-
-      if (authenticateUser(passcode)) {
-        errorEl.classList.remove('show');
-        showMainContent();
+    document.getElementById('passwordButton').onclick = () => {
+      if (authenticate(document.getElementById('passwordInput').value)) {
+        document.getElementById('passwordOverlay').classList.add('hidden');
+        document.getElementById('mainApp').style.display = 'flex';
+        initApp();
       } else {
-        errorEl.classList.add('show');
+        document.getElementById('passwordError').classList.add('show');
         document.getElementById('passwordInput').value = '';
-        document.getElementById('passwordInput').focus();
       }
-    }
+    };
 
-    // Check authentication on page load
-    document.addEventListener('DOMContentLoaded', () => {
-      if (checkAuthentication()) {
-        showMainContent();
-      } else {
-        // Setup password form
-        document.getElementById('passwordButton').addEventListener('click', handlePasswordSubmit);
-        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
-          if (e.key === 'Enter') {
-            handlePasswordSubmit();
-          }
-        });
-        document.getElementById('passwordInput').focus();
-      }
-    });
+    document.getElementById('passwordInput').onkeypress = (e) => {
+      if (e.key === 'Enter') document.getElementById('passwordButton').click();
+    };
 
-    // ── Theme Management ────────────────────────────────
+    // Theme
     function initTheme() {
-      const saved = sessionStorage.getItem('cv-theme');
-      const theme = saved || 'dark';
+      const theme = sessionStorage.getItem('cv-theme') || 'dark';
       document.documentElement.setAttribute('data-theme', theme);
       updateThemeUI(theme);
     }
 
-    function toggleTheme() {
+    function updateThemeUI(theme) {
+      document.getElementById('theme-icon').textContent = theme === 'dark' ? '☀️' : '🌙';
+      document.getElementById('logo-dark').style.display = theme === 'dark' ? 'block' : 'none';
+      document.getElementById('logo-light').style.display = theme === 'light' ? 'block' : 'none';
+    }
+
+    document.getElementById('theme-toggle').onclick = () => {
       const current = document.documentElement.getAttribute('data-theme');
       const next = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       sessionStorage.setItem('cv-theme', next);
       updateThemeUI(next);
+    };
+
+    // Form
+    function initApp() {
+      initTheme();
+      const saved = localStorage.getItem('dpia');
+      if (saved) formData = JSON.parse(saved);
+      loadStep(1);
+      addRiskRow();
+      addMitigationRow();
+      document.getElementById('step7-review').valueAsDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
     }
 
-    function updateThemeUI(theme) {
-      const themeToggle = document.getElementById('theme-toggle');
-      const logoDark = document.getElementById('logo-dark');
-      const logoLight = document.getElementById('logo-light');
-      const themeIcon = document.getElementById('theme-icon');
-
-      if (themeIcon) themeIcon.innerHTML = theme === 'dark' ? '&#x2600;' : '&#x1F319;';
-      if (logoDark) logoDark.style.display = theme === 'dark' ? 'block' : 'none';
-      if (logoLight) logoLight.style.display = theme === 'light' ? 'block' : 'none';
+    function saveForm() {
+      const form = document.querySelector('.form-container.active form');
+      if (form) {
+        form.querySelectorAll('[id]').forEach(el => {
+          if (el.type === 'checkbox') formData[el.id] = el.checked;
+          else if (el.type === 'radio') {
+            const checked = form.querySelector(`[name="${el.name}"]:checked`);
+            if (checked) formData[el.name] = checked.value;
+          } else {
+            formData[el.id] = el.value;
+          }
+        });
+      }
+      localStorage.setItem('dpia', JSON.stringify(formData));
     }
 
-    // Attach theme toggle listener if element exists
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    if (themeToggleBtn) {
-      themeToggleBtn.addEventListener('click', toggleTheme);
+    function loadStep(step) {
+      saveForm();
+      currentStep = step;
+      document.querySelectorAll('.form-container').forEach(el => el.classList.remove('active'));
+      document.querySelector(`[data-step="${step}"]`).classList.add('active');
+
+      const form = document.querySelector('.form-container.active form');
+      if (form) {
+        form.querySelectorAll('[id]').forEach(el => {
+          if (el.type === 'checkbox') el.checked = formData[el.id] === true;
+          else if (el.type === 'radio') {
+            if (formData[el.name] === el.value) el.checked = true;
+          } else {
+            el.value = formData[el.id] || '';
+          }
+        });
+      }
+
+      updateMinimap();
+      window.scrollTo(0, 0);
+    }
+
+    function goToStep(step) { loadStep(step); }
+    function saveAndNext(step) { saveForm(); if (step < 7) loadStep(step + 1); }
+
+    function updateMinimap() {
+      document.querySelectorAll('.minimap-node').forEach((node, i) => {
+        node.classList.remove('active', 'completed');
+        if (i + 1 === currentStep) node.classList.add('active');
+        else if (i + 1 < currentStep) node.classList.add('completed');
+      });
+
+      document.querySelectorAll('.minimap-line').forEach((line, i) => {
+        if (i < currentStep - 1) line.classList.add('completed');
+        else line.classList.remove('completed');
+      });
+    }
+
+    function addRiskRow() {
+      const row = document.createElement('div');
+      row.className = 'risk-row';
+      row.innerHTML = `
+        <input class="risk-cell-input" placeholder="Risk description" />
+        <select class="risk-cell-input"><option>Remote</option><option>Possible</option><option>Probable</option></select>
+        <select class="risk-cell-input"><option>Minimal</option><option>Significant</option><option>Severe</option></select>
+        <select class="risk-cell-input" disabled><option>Low</option><option>Medium</option><option>High</option></select>
+        <button type="button" class="risk-delete-btn" onclick="this.parentElement.remove()">Delete</button>
+      `;
+      document.getElementById('riskTable').appendChild(row);
+    }
+
+    function addMitigationRow() {
+      const row = document.createElement('div');
+      row.className = 'risk-row';
+      row.innerHTML = `
+        <input class="risk-cell-input" placeholder="Risk from Step 5" />
+        <input class="risk-cell-input" placeholder="Proposed measure" />
+        <select class="risk-cell-input"><option>Eliminated</option><option>Reduced</option><option>Accepted</option></select>
+        <select class="risk-cell-input"><option>Low</option><option>Medium</option><option>High</option></select>
+        <input type="date" class="risk-cell-input" />
+        <button type="button" class="risk-delete-btn" onclick="this.parentElement.remove()">Delete</button>
+      `;
+      document.getElementById('mitigationTable').appendChild(row);
+    }
+
+    function completeDPIA() {
+      saveForm();
+      alert('✓ DPIA Complete!\n\nNext Steps:\n- Review with DPO\n- Export documentation (coming soon)\n- Integrate with ROPA');
+    }
+
+    // Init
+    if (checkAuth()) {
+      document.getElementById('passwordOverlay').classList.add('hidden');
+      document.getElementById('mainApp').style.display = 'flex';
+      initApp();
+    } else {
+      document.getElementById('passwordInput').focus();
     }
   </script>
 
 </body>
+
 </html>
